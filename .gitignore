@@ -1,1 +1,2 @@
-iccv09Data
+*.pyc
+__pycache__
