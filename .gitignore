@@ -1,2 +1,6 @@
 *.pyc
 __pycache__
+.ipynb_checkpoints/
+h5py/
+iccv09Data/
+useless/
