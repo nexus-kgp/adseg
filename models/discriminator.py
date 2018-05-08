@@ -31,7 +31,7 @@ class LargeFOV(nn.Module):
 
 class StanfordBNet(nn.Module):
     def __init__(self, n_class=8):
-        super(StanfordBLoss, self).__init__()
+        super(StanfordBNet, self).__init__()
 
         self.conv1_1 = nn.Conv2d(n_class, 64, 5, stride=1, padding=1)
 
@@ -59,8 +59,8 @@ class StanfordBNet(nn.Module):
         res3 = F.max_pool2d(res3, 2, stride=1)
         res3 = F.relu(self.conv3_3(res3))
         res3 = self.conv3_4(res3)
-
+        # return res
         out = F.avg_pool2d(res3, (res3.shape[2],res3.shape[3]))
         out = F.softmax(out)
-
-        return out
+        n , _ , _ ,_  = segmented_input.size()
+        return out.view(n,-1).transpose(0,1)[0]
