@@ -58,7 +58,8 @@ class fcn32s(nn.Module):
             nn.Conv2d(4096, 4096, 1),
             nn.ReLU(inplace=True),
             nn.Dropout2d(),
-            nn.Conv2d(4096, self.n_classes, 1),)
+            nn.Conv2d(4096, self.n_classes, 1),
+            nn.Sigmoid(),)
 
         # TODO: Add support for learned upsampling
         if self.learned_billinear:
