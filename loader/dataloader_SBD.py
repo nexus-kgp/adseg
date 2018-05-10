@@ -67,7 +67,7 @@ class SFBD(Dataset):
         
         region = SFBD.load_h5py(self,self.regions[index])
         image = PIL.Image.open(self.image_path + self.file_list[index])
-        resized_image = np.array(image.resize((500,500),PIL.Image.NEAREST)).T
+        resized_image = np.transpose(np.array(image),(2,0,1))
         image_tensor = torch.from_numpy(resized_image).float()
         region_tensor = torch.from_numpy(region).float()
         return {'image':image_tensor,'region':region_tensor}

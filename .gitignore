@@ -4,3 +4,7 @@ __pycache__
 h5py/
 iccv09Data/
 useless/
+traindata/
+train.ipynb
+test.ipynb
+
