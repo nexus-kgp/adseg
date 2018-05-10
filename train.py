@@ -33,7 +33,7 @@ def initialize_fcn32s(n_classes):
     try:
         segmentor = segmentor(n_classes=n_classes)
         vgg16 = models.vgg16(pretrained=True)   ## change it to True
-        # segmentor.init_vgg16_params(vgg16)
+        segmentor.init_vgg16_params(vgg16)
     except:
         print('Error occured in initialising fcn32s')
         sys.exit(1)
@@ -66,10 +66,10 @@ else:
     zeros = Variable(torch.zeros((batch_size)), requires_grad=False)
     ones = Variable(torch.ones((batch_size)), requires_grad=False)
 
-d_loss = nn.BCELoss()
+d_loss = nn.BCELoss(size_average=False)
 
-g_optim = optim.Adam(segmentor.parameters(), lr=1e-4)
-d_optim = optim.Adam(disc.parameters(), lr=1e-4)
+g_optim = optim.Adam(segmentor.parameters(), lr=1e-5)
+d_optim = optim.Adam(disc.parameters(), lr=1e-5)
 
 # g = None
 
@@ -77,46 +77,51 @@ fake_loss_d = []
 real_loss_d = []
 real_loss_gen = []
 
-count = 0
-for i in train_loader:
-    if use_gpu:
-        sample_image = Variable(i['image'].float().cuda())
-        sample_image = local_response_norm(sample_image, 3)
 
-        label = Variable(i['region'].float().cuda())
-    else:
-        sample_image = Variable(i['image'].float())
-        sample_image = local_response_norm(sample_image, 3)
 
-        label = Variable(i['region'].float())
-    # print(sample_image)
-    # break
-    
-    fake_out = segmentor(sample_image)
+def train(n_epoch=1,n_co=10):
+    for i in range(n_epoch):
+        count = 0
+        for i in train_loader:
+            if use_gpu:
+                sample_image = Variable(i['image'].float().cuda())
+                sample_image = local_response_norm(sample_image, 3)
 
-    disc.zero_grad()
-    segmentor.zero_grad()
+                label = Variable(i['region'].float().cuda())
+            else:
+                sample_image = Variable(i['image'].float())
+                sample_image = local_response_norm(sample_image, 3)
 
-    d_fake_out = disc(fake_out,sample_image)
+                label = Variable(i['region'].float())
+            
+            fake_out = segmentor(sample_image)
 
-    fake_err = d_loss(d_fake_out, zeros)
-    fake_err.backward(retain_graph=True)
-    fake_loss_d.append(fake_err[0].clone().cpu().data.numpy()[0])
+            disc.zero_grad()
+            segmentor.zero_grad()
 
-    d_real_out = disc(label, sample_image)
-    real_err = d_loss(d_real_out, ones)
-    real_err.backward()
-    real_loss_d.append(real_err[0].clone().cpu().data.numpy()[0])
+            d_fake_out = disc(fake_out,sample_image)
 
-    d_optim.step()
+            fake_err = d_loss(d_fake_out, zeros)
+            fake_err.backward(retain_graph=True)
+            fake_loss_d.append(fake_err[0].clone().cpu().data.numpy()[0])
 
-    
-    g_err = cross_entropy2d(fake_out, label) + 0.5*(d_loss(d_fake_out,ones))
-    g_err.backward()
-    real_loss_gen.append(g_err[0].clone().cpu().data.numpy()[0])
+            d_real_out = disc(label, sample_image)
+            real_err = d_loss(d_real_out, ones)
+            real_err.backward()
+            real_loss_d.append(real_err[0].clone().cpu().data.numpy()[0])
 
-    g_optim.step()
-    count += 1
-    print("done")
-    if count == 100:
-        break
+            d_optim.step()
+
+            
+            g_err = cross_entropy2d(fake_out, label) + 0.65*(d_loss(d_fake_out,ones))
+            g_err.backward()
+            real_loss_gen.append(g_err[0].clone().cpu().data.numpy()[0])
+
+            g_optim.step()
+            count += 1
+            print("done")
+            if count == n_co:
+                break
+
+
+train(n_epoch=1, n_co=len(dataset))
