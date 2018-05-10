@@ -16,26 +16,15 @@ from torch.autograd import Variable
 from torch.utils import data
 
 from loader.dataloader_SBD import SFBD
-from loss import dummyBCE
+from loss import cross_entropy2d
 from models.segmentor import fcn32s
 from models.discriminator import StanfordBNet
+from LRN.local_response_norm import local_response_norm
 
+from PIL import Image
 
-# def cross_entropy2d(input, target, weight=None, size_average=True):
-#     n, c, h, w = input.size()
-#     log_p = F.log_softmax(input)
-#     log_p = log_p.transpose(1, 2).transpose(2, 3).contiguous().view(-1, c)
-#     # log_p = log_p[target.view(n, h, w, 1).repeat(1, 1, 1, c) >= 0]
-#     log_p = log_p[target.view(n, h, w, 8) >= 0]
-#     log_p = log_p.view(-1, c)
-
-#     mask = target >= 0
-#     target = target[mask]
-#     loss = F.nll_loss(log_p, target, weight=weight, size_average=False)
-#     if size_average:
-#         loss /= mask.data.sum()
-#     return loss
-
+def si(x):
+    Image.fromarray(x).show()
 
 def initialize_fcn32s(n_classes):
 
@@ -43,8 +32,8 @@ def initialize_fcn32s(n_classes):
 
     try:
         segmentor = segmentor(n_classes=n_classes)
-        vgg16 = models.vgg16(pretrained=False)   ## change it to True
-        segmentor.init_vgg16_params(vgg16)
+        vgg16 = models.vgg16(pretrained=True)   ## change it to True
+        # segmentor.init_vgg16_params(vgg16)
     except:
         print('Error occured in initialising fcn32s')
         sys.exit(1)
@@ -63,7 +52,7 @@ if use_gpu:
     segmentor = segmentor.cuda()       # using GPU for processing
     disc = disc.cuda()
 
-dataset = SFBD(image_path="./iccv09Data/images/",region_path="./h5py/")
+dataset = SFBD(image_path="./traindata/images/",region_path="./traindata/h5py/")
 
 batch_size = 1
 train_loader = data.DataLoader(dataset, batch_size=batch_size, num_workers=1, shuffle=True)
@@ -84,13 +73,21 @@ d_optim = optim.Adam(disc.parameters(), lr=1e-4)
 
 # g = None
 
+fake_loss_d = []
+real_loss_d = []
+real_loss_gen = []
+
 count = 0
 for i in train_loader:
     if use_gpu:
         sample_image = Variable(i['image'].float().cuda())
+        sample_image = local_response_norm(sample_image, 3)
+
         label = Variable(i['region'].float().cuda())
     else:
         sample_image = Variable(i['image'].float())
+        sample_image = local_response_norm(sample_image, 3)
+
         label = Variable(i['region'].float())
     # print(sample_image)
     # break
@@ -104,19 +101,22 @@ for i in train_loader:
 
     fake_err = d_loss(d_fake_out, zeros)
     fake_err.backward(retain_graph=True)
+    fake_loss_d.append(fake_err[0].clone().cpu().data.numpy()[0])
 
     d_real_out = disc(label, sample_image)
     real_err = d_loss(d_real_out, ones)
     real_err.backward()
+    real_loss_d.append(real_err[0].clone().cpu().data.numpy()[0])
 
     d_optim.step()
 
     
-    g_err = dummyBCE(fake_out, label) + 0.5*(d_loss(d_fake_out,ones))
+    g_err = cross_entropy2d(fake_out, label) + 0.5*(d_loss(d_fake_out,ones))
     g_err.backward()
+    real_loss_gen.append(g_err[0].clone().cpu().data.numpy()[0])
 
     g_optim.step()
     count += 1
     print("done")
-    if count == 20:
+    if count == 100:
         break
