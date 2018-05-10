@@ -5,7 +5,7 @@ import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
 
-lossfunc = nn.BCELoss()
+lossfunc = nn.BCELoss(size_average=False)
 
 def cross_entropy2d(input, target):
     _ , c , _ , _ = input.size()
