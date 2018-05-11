@@ -38,7 +38,7 @@ The results are:-
 <div align="center">
 	Class 1 :
   <br>
-  <img src="after_12_epoch/class1.png" alt="Class 1"  height='400' width="500">
+  <img src="after_12_epoch/class1.png" alt="Class 1" >
   <br>
   <br>
 </div>
@@ -46,7 +46,7 @@ The results are:-
 <div align="center">
 	Class 2 :
   <br>
-  <img src="after_12_epoch/class2.png" alt="Class 2" height='400' width="500">
+  <img src="after_12_epoch/class2.png" alt="Class 2" >
   <br>
   <br>
 </div>
@@ -55,7 +55,7 @@ The results are:-
 <div align="center">
 	Class 3 :
   <br>
-  <img src="after_12_epoch/class3.png" alt="Class 3" height='400' width="500">
+  <img src="after_12_epoch/class3.png" alt="Class 3" >
   <br>
   <br>
 </div>
@@ -64,7 +64,7 @@ The results are:-
 <div align="center">
 	Class 4 :
   <br>
-  <img src="after_12_epoch/class4.png" alt="Class 4" height='400' width="500">
+  <img src="after_12_epoch/class4.png" alt="Class 4" >
   <br>
   <br>
 </div>
@@ -72,7 +72,7 @@ The results are:-
 <div align="center">
 	Class 5 :
   <br>
-  <img src="after_12_epoch/class5.png" alt="Class 5" height='400' width="500">
+  <img src="after_12_epoch/class5.png" alt="Class 5" >
   <br>
   <br>
 </div>
@@ -80,7 +80,7 @@ The results are:-
 <div align="center">
 	Class 6 :
   <br>
-  <img src="after_12_epoch/class6.png" alt="Class 6" height='400' width="500">
+  <img src="after_12_epoch/class6.png" alt="Class 6" >
   <br>
   <br>
 </div>
@@ -88,7 +88,7 @@ The results are:-
 <div align="center">
 	Class 7 :
   <br>
-  <img src="after_12_epoch/class7.png" alt="Class 7" height='400' width="500">
+  <img src="after_12_epoch/class7.png" alt="Class 7" >
   <br>
   <br>
 </div>
@@ -96,7 +96,7 @@ The results are:-
 <div align="center">
 	Class 8 :
   <br>
-  <img src="after_12_epoch/class8.png" alt="Class 8" height='400' width="500">
+  <img src="after_12_epoch/class8.png" alt="Class 8" >
   <br>
   <br>
 </div>
