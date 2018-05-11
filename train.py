@@ -124,4 +124,4 @@ def train(n_epoch=1,n_co=10):
                 break
 
 
-train(n_epoch=1, n_co=len(dataset))
+train(n_epoch=12, n_co=len(dataset))
