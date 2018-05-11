@@ -7,4 +7,4 @@ useless/
 traindata/
 train.ipynb
 test.ipynb
-
+after_12_epoch/loss_visualize.ipynb
